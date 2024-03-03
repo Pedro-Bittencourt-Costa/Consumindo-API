@@ -39,7 +39,8 @@ public class PostService implements IPostService{
 
         int responseCode = connection.getResponseCode();
 
-        if (!(responseCode == expectedHttpCode)) throw new IOException("Posts não criado");
+        if (!(responseCode == expectedHttpCode))
+            throw new IOException("Post ot found");
 
         BufferedReader response = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         StringBuilder responseString = new StringBuilder();
@@ -113,6 +114,7 @@ public class PostService implements IPostService{
 
         HttpURLConnection connection = connection("DELETE", id);
 
-        if(!(connection.getResponseCode() == HttpURLConnection.HTTP_OK)) throw new IOException("Post not found");
+        if(!(connection.getResponseCode() == HttpURLConnection.HTTP_OK))
+            throw new IOException("Post not found");
     }
 }
