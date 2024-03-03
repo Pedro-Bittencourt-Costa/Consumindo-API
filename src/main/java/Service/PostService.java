@@ -78,7 +78,7 @@ public class PostService implements IPostService{
 
     }
 
-    public Post getPostById(Integer id) throws IOException{
+    public Post getPostById(int id) throws IOException{
 
         HttpURLConnection connection = connection("GET", id);
 
@@ -107,5 +107,12 @@ public class PostService implements IPostService{
         StringBuilder response = responseInStringFormat(connection, HttpURLConnection.HTTP_OK);
 
         return gson.fromJson(response.toString(), Post.class);
+    }
+
+    public void deletePost(int id) throws IOException{
+
+        HttpURLConnection connection = connection("DELETE", id);
+
+        if(!(connection.getResponseCode() == HttpURLConnection.HTTP_OK)) throw new IOException("Post not found");
     }
 }

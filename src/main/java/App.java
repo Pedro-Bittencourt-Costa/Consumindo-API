@@ -18,15 +18,17 @@ public class App {
 //            System.out.println("----------------------");
 //        });
 ////
-        Post postById = postService.getPostById(3);
-        System.out.println(postById);
+//        Post postById = postService.getPostById(3);
+//        System.out.println(postById);
 
-        Post post01 = new Post(9, 4, "deu bom", "Hoje tem gol do gabi golihkbjbjh" );
+//        Post post01 = new Post(23, "deu bom", "testando ultimas atualizações" );
 //        Post createdPost = postService.createPost(post01);
 //        System.out.println(createdPost);
 
-        Post updatedPost = postService.updatePost(post01, 3);
-        System.out.println(updatedPost);
+//        Post updatedPost = postService.updatePost(post01, 3);
+//        System.out.println(updatedPost);
+
+        postService.deletePost(3);
 
     }
 }
