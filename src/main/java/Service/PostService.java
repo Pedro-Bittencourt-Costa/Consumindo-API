@@ -1,8 +1,11 @@
 package Service;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.ProtocolException;
 import java.net.URL;
 
 import Interface.IPostService;
@@ -17,32 +20,57 @@ import com.google.gson.reflect.TypeToken;
 public class PostService implements IPostService{
     private final Gson gson = new Gson();
 
-    public List<Post> getPosts() {
-        try {
-            URL url = new URL("https://jsonplaceholder.typicode.com/posts");
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setRequestMethod("GET");
-            int responseCode = con.getResponseCode();
+    public HttpURLConnection connection(String methodHttp) throws IOException {
+        URL url = new URL("https://jsonplaceholder.typicode.com/posts");
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod(methodHttp.toUpperCase());
+        return con;
+    }
 
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                BufferedReader reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
-                StringBuilder response = new StringBuilder();
-                String line;
+    public StringBuilder responseInStringFormat(HttpURLConnection con, int expectedHttpCode) throws  IOException {
+        int responseCode = con.getResponseCode();
 
-                while ((line = reader.readLine()) != null) {
-                    response.append(line);
-                }
+        if (!(responseCode == expectedHttpCode)) throw new IOException("Posts não criado");
 
-                Type listType = new TypeToken<ArrayList<Post>>() {
-                }.getType();
-                return gson.fromJson(response.toString(), listType);
+        BufferedReader response = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        StringBuilder responseString = new StringBuilder();
+        String line;
 
-            }
-
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            // TODO: handle exception
+        while ((line = response.readLine()) != null) {
+            responseString.append(line);
         }
-        return new ArrayList<>();
+
+        return responseString;
+    }
+
+
+    public Post createPost(Post post) throws IOException {
+
+        HttpURLConnection con = connection("POST");
+        con.setRequestProperty("Content-Type", "application/json");
+        con.setDoOutput(true);
+
+        String postJson = gson.toJson(post);
+
+        DataOutputStream sendPost = new DataOutputStream(con.getOutputStream());
+        sendPost.writeBytes(postJson);
+        sendPost.flush();
+        sendPost.close();
+
+        StringBuilder responseString = responseInStringFormat(con, HttpURLConnection.HTTP_CREATED);
+
+        return gson.fromJson(responseString.toString(), Post.class);
+
+    }
+
+    public List<Post> getPosts() throws IOException {
+
+        HttpURLConnection connection = connection("Get");
+
+        StringBuilder response = responseInStringFormat(connection, HttpURLConnection.HTTP_OK);
+        Type listType = new TypeToken<ArrayList<Post>>() {}.getType();
+
+        return gson.fromJson(response.toString(), listType);
+
     }
 }

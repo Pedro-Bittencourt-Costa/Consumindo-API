@@ -7,6 +7,7 @@ import java.util.List;
 public class App {
 
     public static void main(String[] args) throws Exception {
+
         IPostService postService = new PostService();
         List<Post> posts = postService.getPosts();
 
@@ -16,6 +17,11 @@ public class App {
             System.out.println("Body:" + post.getBody());
             System.out.println("----------------------");
         });
+//
+
+//        Post post01 = new Post(9, 4, "deu bom", "Hoje tem gol do gabi golihkbjbjh" );
+//        Post createdPost = postService.createPost(post01);
+//        System.out.println(createdPost);
 
     }
 }

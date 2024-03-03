@@ -6,6 +6,15 @@ public class Post {
     private String title;
     private String body;
 
+    public Post(){}
+
+    public Post(Integer userId, Integer id, String title, String body) {
+        this.userId = userId;
+        this.id = id;
+        this.title = title;
+        this.body = body;
+    }
+
     public void setUserId(Integer userId) {
         this.userId = userId;
     }
@@ -38,4 +47,13 @@ public class Post {
         return body;
     }
 
+    @Override
+    public String toString() {
+        return "Post{" +
+                "userId=" + userId +
+                ", id=" + id +
+                ", title='" + title + '\'' +
+                ", body='" + body + '\'' +
+                '}';
+    }
 }
