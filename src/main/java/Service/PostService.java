@@ -5,7 +5,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.ProtocolException;
 import java.net.URL;
 
 import Interface.IPostService;
@@ -21,25 +20,28 @@ public class PostService implements IPostService{
     private final Gson gson = new Gson();
 
     public HttpURLConnection connection(String methodHttp) throws IOException {
+
         URL url = new URL("https://jsonplaceholder.typicode.com/posts");
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod(methodHttp.toUpperCase());
-        return con;
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod(methodHttp.toUpperCase());
+        return connection;
     }
 
     public HttpURLConnection connection(String methodHttp, int id) throws IOException {
+
         URL url = new URL("https://jsonplaceholder.typicode.com/posts" + "/" +id);
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod(methodHttp.toUpperCase());
-        return con;
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+        connection.setRequestMethod(methodHttp.toUpperCase());
+        return connection;
     }
 
-    public StringBuilder responseInStringFormat(HttpURLConnection con, int expectedHttpCode) throws  IOException {
-        int responseCode = con.getResponseCode();
+    public StringBuilder responseInStringFormat(HttpURLConnection connection, int expectedHttpCode) throws  IOException {
+
+        int responseCode = connection.getResponseCode();
 
         if (!(responseCode == expectedHttpCode)) throw new IOException("Posts não criado");
 
-        BufferedReader response = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        BufferedReader response = new BufferedReader(new InputStreamReader(connection.getInputStream()));
         StringBuilder responseString = new StringBuilder();
         String line;
 
@@ -50,21 +52,27 @@ public class PostService implements IPostService{
         return responseString;
     }
 
+    public void sendBody(HttpURLConnection connection, Post post) throws IOException{
 
-    public Post createPost(Post post) throws IOException {
-
-        HttpURLConnection con = connection("POST");
-        con.setRequestProperty("Content-Type", "application/json");
-        con.setDoOutput(true);
+        connection.setRequestProperty("Content-Type", "application/json");
+        connection.setDoOutput(true);
 
         String postJson = gson.toJson(post);
 
-        DataOutputStream sendPost = new DataOutputStream(con.getOutputStream());
+        DataOutputStream sendPost = new DataOutputStream(connection.getOutputStream());
         sendPost.writeBytes(postJson);
         sendPost.flush();
         sendPost.close();
+    }
 
-        StringBuilder responseString = responseInStringFormat(con, HttpURLConnection.HTTP_CREATED);
+
+    public Post createPost(Post post) throws IOException {
+
+        HttpURLConnection connection = connection("POST");
+
+        sendBody(connection, post);
+
+        StringBuilder responseString = responseInStringFormat(connection, HttpURLConnection.HTTP_CREATED);
 
         return gson.fromJson(responseString.toString(), Post.class);
 
@@ -88,5 +96,16 @@ public class PostService implements IPostService{
 
         return gson.fromJson(response.toString(), listType);
 
+    }
+
+    public Post updatePost(Post post, int id) throws IOException{
+
+        HttpURLConnection connection = connection("PUT", id);
+
+        sendBody(connection, post);
+
+        StringBuilder response = responseInStringFormat(connection, HttpURLConnection.HTTP_OK);
+
+        return gson.fromJson(response.toString(), Post.class);
     }
 }
