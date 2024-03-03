@@ -27,6 +27,13 @@ public class PostService implements IPostService{
         return con;
     }
 
+    public HttpURLConnection connection(String methodHttp, int id) throws IOException {
+        URL url = new URL("https://jsonplaceholder.typicode.com/posts" + "/" +id);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod(methodHttp.toUpperCase());
+        return con;
+    }
+
     public StringBuilder responseInStringFormat(HttpURLConnection con, int expectedHttpCode) throws  IOException {
         int responseCode = con.getResponseCode();
 
@@ -61,6 +68,15 @@ public class PostService implements IPostService{
 
         return gson.fromJson(responseString.toString(), Post.class);
 
+    }
+
+    public Post getPostById(Integer id) throws IOException{
+
+        HttpURLConnection connection = connection("GET", id);
+
+        StringBuilder response = responseInStringFormat(connection, HttpURLConnection.HTTP_OK);
+
+        return gson.fromJson(response.toString(), Post.class);
     }
 
     public List<Post> getPosts() throws IOException {
